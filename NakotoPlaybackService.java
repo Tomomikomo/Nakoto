@@ -1,3 +1,5 @@
+// Includes management of http and https streams, which I removed from the app
+
 package com.bitoneko.music;
 
 import android.app.Service;
