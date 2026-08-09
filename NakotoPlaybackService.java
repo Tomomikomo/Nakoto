@@ -145,6 +145,14 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
         }
         PlayerQueueManager.qIdx = serviceQueueIndex;
         saveServicePreferences();
+        
+        com.bitoneko.music.QueueBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.PlayerPanelController.forceSyncFromService();
+        com.bitoneko.music.MiniPlayerController.forceSyncFromService();
+        com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.SearchResults.forceSyncFromService();
     }
 
     public void startTrackPlayback(int index) {
@@ -179,6 +187,11 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
         com.bitoneko.music.PlayerPanelController.forceSyncFromService();
         com.bitoneko.music.MiniPlayerController.forceSyncFromService();
         com.bitoneko.music.PlayerEffectsDialog.applyParams(null);
+        com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+        com.bitoneko.music.SearchResults.forceSyncFromService();
+
     }
 
     @Override
@@ -203,6 +216,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                     com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                     com.bitoneko.music.MiniPlayerController.forceSyncFromService();
                     com.bitoneko.music.QueueBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.SearchResults.forceSyncFromService();
                 } catch(Exception e){}
             }
         } else {
@@ -262,6 +279,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                     com.bitoneko.music.QueueBottomdialogFragmentActivity.forceSyncFromService();
                     com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                     com.bitoneko.music.MiniPlayerController.forceSyncFromService();
+                    com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.SearchResults.forceSyncFromService();
                 }
             }
             @Override
@@ -274,6 +295,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                     com.bitoneko.music.QueueBottomdialogFragmentActivity.forceSyncFromService();
                     com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                     com.bitoneko.music.MiniPlayerController.forceSyncFromService();
+                    com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                    com.bitoneko.music.SearchResults.forceSyncFromService();
                 }
             }
             @Override
@@ -292,6 +317,27 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                 }
             }
         });
+    }
+    
+    public static void forceSyncFromService() {
+        if (com.bitoneko.music.PlayerPanelController.act != null) {
+            com.bitoneko.music.PlayerPanelController.act.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (NakotoPlaybackService.isServicePlaying != (NakotoPlaybackService.mediaPlayer != null && NakotoPlaybackService.mediaPlayer.isPlaying())) {
+                            NakotoPlaybackService.isServicePlaying = NakotoPlaybackService.mediaPlayer != null && NakotoPlaybackService.mediaPlayer.isPlaying();
+                            com.bitoneko.music.PlayerPanelController.updatePanelUi();
+                            com.bitoneko.music.MiniPlayerController.updateMiniUi();
+                            com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.SearchResults.forceSyncFromService();
+                        }
+                    } catch(Exception e){}
+                }
+            });
+        }
     }
 
     private void showMediaNotification() {
@@ -336,9 +382,9 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
         }
 
         android.media.MediaMetadata.Builder metaBuilder = new android.media.MediaMetadata.Builder()
-            .putString(android.media.MediaMetadata.METADATA_KEY_TITLE, trackTitle)
-            .putString(android.media.MediaMetadata.METADATA_KEY_ARTIST, artist)
-            .putLong(android.media.MediaMetadata.METADATA_KEY_DURATION, trackDuration);
+        .putString(android.media.MediaMetadata.METADATA_KEY_TITLE, trackTitle)
+        .putString(android.media.MediaMetadata.METADATA_KEY_ARTIST, artist)
+        .putLong(android.media.MediaMetadata.METADATA_KEY_DURATION, trackDuration);
         if (artBitmap != null) {
             metaBuilder.putBitmap(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART, artBitmap);
         }
@@ -356,7 +402,7 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
             }
         } catch(Exception e){}
         
-                float activeSpeed = 1.0f;
+        float activeSpeed = 1.0f;
         try {
             activeSpeed = com.bitoneko.music.PlayerEffectsDialog.currentSpeed;
         } catch(Exception e) {
@@ -364,10 +410,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
         }
 
         android.media.session.PlaybackState.Builder stateBuilder = new android.media.session.PlaybackState.Builder()
-            .setState(state, position, activeSpeed)
-            .setActions(android.media.session.PlaybackState.ACTION_PLAY | android.media.session.PlaybackState.ACTION_PAUSE | 
-                        android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT | android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS |
-                        android.media.session.PlaybackState.ACTION_SEEK_TO);
+        .setState(state, position, activeSpeed)
+        .setActions(android.media.session.PlaybackState.ACTION_PLAY | android.media.session.PlaybackState.ACTION_PAUSE | 
+        android.media.session.PlaybackState.ACTION_SKIP_TO_NEXT | android.media.session.PlaybackState.ACTION_SKIP_TO_PREVIOUS |
+        android.media.session.PlaybackState.ACTION_SEEK_TO);
         mediaSession.setPlaybackState(stateBuilder.build());
 
         android.content.Intent notificationIntent = new android.content.Intent(this, MainActivity.class);
@@ -510,6 +556,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                             sendBroadcast(new Intent("com.bitoneko.music.TRACK_CHANGED"));
                             com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                             com.bitoneko.music.MiniPlayerController.forceSyncFromService();
+                            com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.SearchResults.forceSyncFromService();
                         } catch(Exception e){}
                     }
                 });
@@ -551,6 +601,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                         try {
                             com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                             com.bitoneko.music.MiniPlayerController.forceSyncFromService();
+                            com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                            com.bitoneko.music.SearchResults.forceSyncFromService();
                         } catch(Exception e){}
                     }
                 }, 100);
@@ -683,6 +737,10 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
                                                         com.bitoneko.music.PlayerPanelController.forceSyncFromService();
                                                         com.bitoneko.music.MiniPlayerController.forceSyncFromService();
                                                         com.bitoneko.music.QueueBottomdialogFragmentActivity.forceSyncFromService();
+                                                        com.bitoneko.music.AlbumBottomdialogFragmentActivity.forceSyncFromService();
+                                                        com.bitoneko.music.ArtistBottomdialogFragmentActivity.forceSyncFromService();
+                                                        com.bitoneko.music.PlaylistBottomdialogFragmentActivity.forceSyncFromService();
+                                                        com.bitoneko.music.SearchResults.forceSyncFromService();
                                                     } catch(Exception ex){}
                                                 }
                                             });
@@ -722,4 +780,4 @@ public class NakotoPlaybackService extends Service implements MediaPlayer.OnComp
         if (nanoEqualizer != null) nanoEqualizer.release();
         if (nanoReverb != null) nanoReverb.release();
     }
-}
+ }
