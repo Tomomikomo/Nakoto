@@ -21,4 +21,4 @@ This project was developed entirely on mobile devices (initially on a smartphone
 Android 10+ is required for working with playlists.
 
 ## APK
-In the **Releases** section
+In the **Releases** page.
